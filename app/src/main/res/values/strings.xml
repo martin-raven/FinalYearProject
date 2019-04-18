@@ -1,3 +1,4 @@
 <resources>
-    <string name="app_name">SecondAttendance</string>
+    <string name="take_picture">Take picture</string>
+    <string name="app_name">Attendance</string>
 </resources>
