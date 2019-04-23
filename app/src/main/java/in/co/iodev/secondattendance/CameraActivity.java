@@ -108,7 +108,9 @@ public class CameraActivity extends AppCompatActivity {
         DisplayName=findViewById(R.id.NameDisplay);
         DisplayNameVisibility=findViewById(R.id.NameDisplayVisibility);
         DisplayNumber=findViewById(R.id.DisplayNumber);
-        sharedPref = this.getPreferences(Context.MODE_PRIVATE);
+        sharedPref = this.getSharedPreferences("Default",Context.MODE_PRIVATE);
+//        Log.d("CollectionId",sharedPref.getString("CollectionId",""));
+
 //        takePictureButton = (Button) findViewById(R.id.btn_takepicture);
 //        assert takePictureButton != null;
 
@@ -295,8 +297,10 @@ public class CameraActivity extends AppCompatActivity {
 
                 JSONObject jsonBody = new JSONObject();
                 jsonBody.put("Image", image64);
+                Log.d("CollectionId while upload",sharedPref.getString("CollectionId",""));
                 jsonBody.put("CollectionId", sharedPref.getString("CollectionId",""));
                 final String requestBody = jsonBody.toString();
+                Log.d("RequestJson",requestBody);
 
                 StringRequest stringRequest = new StringRequest(Request.Method.POST, URL, new Response.Listener<String>() {
 
@@ -432,7 +436,7 @@ public class CameraActivity extends AppCompatActivity {
 
     private String convertBase64(Bitmap bitmap) {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 20, outputStream);
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 50, outputStream);
 
         return Base64.encodeToString(outputStream.toByteArray(), Base64.DEFAULT);
     }

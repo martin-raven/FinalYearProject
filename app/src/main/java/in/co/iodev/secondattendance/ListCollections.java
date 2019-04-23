@@ -45,7 +45,7 @@ public class ListCollections extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_list_collections);
         context=this;
-        sharedPref = this.getPreferences(Context.MODE_PRIVATE);
+        sharedPref = this.getSharedPreferences("Default",Context.MODE_PRIVATE);
         editor = sharedPref.edit();
         classes.clear();
         classes.add("Empty List");
