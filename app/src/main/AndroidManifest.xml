@@ -19,6 +19,10 @@
         <activity
             android:screenOrientation="portrait"
             android:name=".CameraActivity">
+
+        </activity>
+        <activity
+            android:name=".ListCollections">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
