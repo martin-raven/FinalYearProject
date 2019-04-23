@@ -2,6 +2,7 @@ package in.co.iodev.secondattendance;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -94,16 +95,20 @@ public class CameraActivity extends AppCompatActivity {
     private Handler mBackgroundHandler;
     private HandlerThread mBackgroundThread;
     private Thread thread;
+    SharedPreferences sharedPref;
+    private Context context;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.camera_activity);
         textureView = (TextureView) findViewById(R.id.texture);
         assert textureView != null;
+        context=this;
         textureView.setSurfaceTextureListener(textureListener);
         DisplayName=findViewById(R.id.NameDisplay);
         DisplayNameVisibility=findViewById(R.id.NameDisplayVisibility);
         DisplayNumber=findViewById(R.id.DisplayNumber);
+        sharedPref = this.getPreferences(Context.MODE_PRIVATE);
 //        takePictureButton = (Button) findViewById(R.id.btn_takepicture);
 //        assert takePictureButton != null;
 
@@ -290,6 +295,7 @@ public class CameraActivity extends AppCompatActivity {
 
                 JSONObject jsonBody = new JSONObject();
                 jsonBody.put("Image", image64);
+                jsonBody.put("CollectionId", sharedPref.getString("CollectionId",""));
                 final String requestBody = jsonBody.toString();
 
                 StringRequest stringRequest = new StringRequest(Request.Method.POST, URL, new Response.Listener<String>() {

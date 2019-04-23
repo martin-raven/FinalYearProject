@@ -1,6 +1,8 @@
 package in.co.iodev.secondattendance;
 
 import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
@@ -36,15 +38,17 @@ public class ListCollections extends AppCompatActivity {
     ArrayList<String> classes=new ArrayList<>();
     ArrayAdapter<String> spinnerAdapter;
     Context context;
-
+    SharedPreferences sharedPref;
+    SharedPreferences.Editor editor;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_list_collections);
         context=this;
+        sharedPref = this.getPreferences(Context.MODE_PRIVATE);
+        editor = sharedPref.edit();
         classes.clear();
-        classes.add("hello");
-        classes.add("hey");
+        classes.add("Empty List");
         spinner = findViewById(R.id.spinner);
         button = findViewById(R.id.button);
 
@@ -59,6 +63,9 @@ public class ListCollections extends AppCompatActivity {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
                 Log.d("SelectClass",classes.get(i));
+
+                editor.putString("CollectionId",classes.get(i));
+                editor.commit();
             }
 
             @Override
@@ -70,7 +77,8 @@ public class ListCollections extends AppCompatActivity {
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                    Intent CameraActivity = new Intent(getBaseContext(), in.co.iodev.secondattendance.CameraActivity.class);
+                    startActivity(CameraActivity);
             }
         });
     }
@@ -95,7 +103,6 @@ public class ListCollections extends AppCompatActivity {
                             classes = list;
                             spinnerAdapter = new ArrayAdapter(context, android.R.layout.simple_spinner_item, classes);
                             spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-
                             spinner.setAdapter(spinnerAdapter);
                             Log.d("SelectClass",classes.toString());
                         } catch (JSONException e) {
