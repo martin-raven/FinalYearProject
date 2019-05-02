@@ -99,7 +99,7 @@ public class CameraActivity extends AppCompatActivity {
     private HandlerThread mBackgroundThread;
     private Thread thread;
     private ImageButton Menu_Btn;
-    private Button CloseBtn;
+    private Button CloseBtn,SubmitBtn;
     private ListView StudentsList;
     private List<Model> StudentModelList=new ArrayList<Model>();
     private CustomAdapter customAdapter;
@@ -120,6 +120,7 @@ public class CameraActivity extends AppCompatActivity {
         StudentsList=findViewById(R.id.ListView);
         StudentListLayout=findViewById(R.id.StudentList);
         CloseBtn=findViewById(R.id.CloseBtn);
+        SubmitBtn=findViewById(R.id.SubmitBtn);
         sharedPref = this.getSharedPreferences("Default",Context.MODE_PRIVATE);
 //        Log.d("CollectionId",sharedPref.getString("CollectionId",""));
 
@@ -130,7 +131,7 @@ public class CameraActivity extends AppCompatActivity {
         CameraPreview.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(CameraActivity.this,"Cheese",Toast.LENGTH_LONG).show();
+                Toast.makeText(CameraActivity.this,"Saving...",Toast.LENGTH_LONG).show();
                 takePicture();
             }
         });
@@ -150,6 +151,13 @@ public class CameraActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 StudentListLayout.setVisibility(View.GONE);
+            }
+        });
+        SubmitBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                uploadListToWeb(AttendeeList);
+
             }
         });
 
@@ -334,6 +342,90 @@ public class CameraActivity extends AppCompatActivity {
         } catch (CameraAccessException e) {
             e.printStackTrace();
         }
+    }
+    private void uploadListToWeb(List<String> StudentList) {
+        try {
+            String URL = "https://m93y8bihcj.execute-api.ap-south-1.amazonaws.com/Dev/updateattendance";
+            RequestQueue requestQueue = Volley.newRequestQueue(this);
+
+            JSONObject jsonBody = new JSONObject();
+            jsonBody.put("Class", sharedPref.getString("CollectionId",""));
+            jsonBody.put("TimeStamp",String.valueOf(System.currentTimeMillis()/1000));
+            jsonBody.put("StudentList",new JSONArray(StudentList));
+            final String requestBody = jsonBody.toString();
+            Log.d("RequestJson", requestBody);
+
+            StringRequest stringRequest = new StringRequest(Request.Method.POST, URL, new Response.Listener<String>() {
+
+                @Override
+                public void onResponse(String response) {
+                    Log.i("Response", response);
+                }
+            }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    Log.e("VOLLEY", error.toString());
+                }
+            }) {
+                @Override
+                public String getBodyContentType() {
+                    return "application/json; charset=utf-8";
+                }
+
+                @Override
+                public byte[] getBody() throws AuthFailureError {
+                    try {
+                        return requestBody == null ? null : requestBody.getBytes("utf-8");
+                    } catch (UnsupportedEncodingException uee) {
+                        VolleyLog.wtf("Unsupported Encoding while trying to get the bytes of %s using %s", requestBody, "utf-8");
+                        return null;
+                    }
+                }
+
+
+                @Override
+                protected Response<String> parseNetworkResponse(NetworkResponse response) {
+                    String responseString = "";
+                    String responseData = "";
+                    if (response != null) {
+                        responseString = new String(response.data);
+                        Log.d("Response String", responseString);
+                        JSONObject parsed = null;
+                        try {
+                            parsed = new JSONObject(responseString);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                        Log.i("resultDataString", responseString);
+                        if (parsed != null) {
+                            Log.i("resultData", parsed.toString());
+                        }
+
+                        if (parsed.has("Message")) {
+
+                            try {
+                                final String message= (String) parsed.get("Message");
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        Toast.makeText(CameraActivity.this, message, Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        }
+                        // can get more details such as response.headers
+                    }
+                    return Response.success(responseString, HttpHeaderParser.parseCacheHeaders(response));
+                }
+            };
+            int socketTimeout = 360000;//30 seconds - change to what you want
+            RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
+            stringRequest.setRetryPolicy(policy);
+            requestQueue.add(stringRequest);
+        }catch (Exception e){e.printStackTrace();}
     }
     private void uploadPictureToWeb(Bitmap bitimage) {
         if(bitimage!=null) {
