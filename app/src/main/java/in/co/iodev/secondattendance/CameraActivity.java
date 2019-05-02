@@ -137,8 +137,13 @@ public class CameraActivity extends AppCompatActivity {
         Menu_Btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                if(StudentListLayout.getVisibility()==View.GONE){
                 StudentListLayout.setVisibility(View.VISIBLE);
                 UpdateList();
+                }
+                else{
+                    StudentListLayout.setVisibility(View.GONE);
+                }
             }
         });
         CloseBtn.setOnClickListener(new View.OnClickListener() {
@@ -461,7 +466,7 @@ public class CameraActivity extends AppCompatActivity {
                                 }
                             }
                         });
-                        Thread.sleep(1500);
+                        Thread.sleep(1000);
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
@@ -479,7 +484,7 @@ public class CameraActivity extends AppCompatActivity {
 
     private String convertBase64(Bitmap bitmap) {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 30, outputStream);
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 25, outputStream);
 
         return Base64.encodeToString(outputStream.toByteArray(), Base64.DEFAULT);
     }
