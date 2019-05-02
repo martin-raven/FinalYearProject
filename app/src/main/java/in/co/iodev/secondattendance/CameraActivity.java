@@ -558,7 +558,7 @@ public class CameraActivity extends AppCompatActivity {
                                 }
                             }
                         });
-                        Thread.sleep(1000);
+                        Thread.sleep(500);
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
