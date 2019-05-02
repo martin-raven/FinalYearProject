@@ -13,10 +13,6 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".MainActivity">
-
-        </activity>
-        <activity
             android:screenOrientation="portrait"
             android:name=".CameraActivity">
 

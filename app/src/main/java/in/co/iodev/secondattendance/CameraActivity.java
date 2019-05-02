@@ -30,12 +30,15 @@ import android.util.Base64;
 import android.util.Log;
 import android.util.Size;
 import android.util.SparseIntArray;
+import android.view.Display;
 import android.view.Surface;
 import android.view.TextureView;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -72,7 +75,7 @@ import java.util.List;
 public class CameraActivity extends AppCompatActivity {
     private static final String TAG = "AndroidCameraApi";
     private TextView DisplayName,DisplayNumber;
-    private LinearLayout DisplayNameVisibility;
+    private LinearLayout DisplayNameVisibility,StudentListLayout;
     private TextureView textureView;
     private static final SparseIntArray ORIENTATIONS = new SparseIntArray();
     static {
@@ -95,6 +98,11 @@ public class CameraActivity extends AppCompatActivity {
     private Handler mBackgroundHandler;
     private HandlerThread mBackgroundThread;
     private Thread thread;
+    private ImageButton Menu_Btn;
+    private Button CloseBtn;
+    private ListView StudentsList;
+    private List<Model> StudentModelList=new ArrayList<Model>();
+    private CustomAdapter customAdapter;
     SharedPreferences sharedPref;
     private Context context;
     @Override
@@ -108,6 +116,10 @@ public class CameraActivity extends AppCompatActivity {
         DisplayName=findViewById(R.id.NameDisplay);
         DisplayNameVisibility=findViewById(R.id.NameDisplayVisibility);
         DisplayNumber=findViewById(R.id.DisplayNumber);
+        Menu_Btn=findViewById(R.id.MenuBtn);
+        StudentsList=findViewById(R.id.ListView);
+        StudentListLayout=findViewById(R.id.StudentList);
+        CloseBtn=findViewById(R.id.CloseBtn);
         sharedPref = this.getSharedPreferences("Default",Context.MODE_PRIVATE);
 //        Log.d("CollectionId",sharedPref.getString("CollectionId",""));
 
@@ -122,12 +134,43 @@ public class CameraActivity extends AppCompatActivity {
                 takePicture();
             }
         });
+        Menu_Btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                StudentListLayout.setVisibility(View.VISIBLE);
+                UpdateList();
+            }
+        });
+        CloseBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                StudentListLayout.setVisibility(View.GONE);
+            }
+        });
+
 //        takePictureButton.setOnClickListener(new View.OnClickListener() {
 //            @Override
 //            public void onClick(View v) {
 //                takePicture();
 //            }
 //        });
+    }
+    public void UpdateList(){
+        try {
+            StudentModelList.clear();
+            for (int i = 0; i < AttendeeList.size(); i++) {
+                Model model = new Model();
+                model.setName(AttendeeList.get(i));
+                StudentModelList.add(model);
+            }
+            customAdapter = new CustomAdapter(context, StudentModelList);
+            StudentsList.setAdapter(customAdapter);
+            DisplayNumber.setText((String.valueOf(AttendeeList.size())));
+        }catch (Exception e){e.printStackTrace();}
+    }
+    public void removeFromlist(int position){
+        AttendeeList.remove(position);
+        UpdateList();
     }
     TextureView.SurfaceTextureListener textureListener = new TextureView.SurfaceTextureListener() {
         @Override
@@ -436,7 +479,7 @@ public class CameraActivity extends AppCompatActivity {
 
     private String convertBase64(Bitmap bitmap) {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 50, outputStream);
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 30, outputStream);
 
         return Base64.encodeToString(outputStream.toByteArray(), Base64.DEFAULT);
     }
@@ -468,6 +511,7 @@ public class CameraActivity extends AppCompatActivity {
             e.printStackTrace();
         }
     }
+
     private void openCamera() {
         CameraManager manager = (CameraManager) getSystemService(Context.CAMERA_SERVICE);
         Log.e(TAG, "is camera open");
@@ -537,4 +581,5 @@ public class CameraActivity extends AppCompatActivity {
         stopBackgroundThread();
         super.onPause();
     }
+
 }
