@@ -46,6 +46,7 @@
         android:layout_margin="15dp"
         android:gravity="center_horizontal"
         android:orientation="vertical"
+        android:weightSum="20"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
         <Button
@@ -54,15 +55,19 @@
             android:text="Close"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
+        <ListView
+            android:layout_weight="18"
+            android:id="@+id/ListView"
+            android:layout_margin="5dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
         <Button
             android:id="@+id/SubmitBtn"
             android:text="Submit"
+            android:layout_weight="2"
+            android:layout_margin="5dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
-        <ListView
-            android:id="@+id/ListView"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
 
     </LinearLayout>
     <LinearLayout
